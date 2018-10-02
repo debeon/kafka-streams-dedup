@@ -7,7 +7,7 @@ import org.apache.kafka.streams.kstream.Materialized;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-public class Consumer {
+public class ConsumerStream {
     public static void main(String[] args) {
 
         Properties streamsConfiguration = new Properties();
@@ -21,7 +21,9 @@ public class Consumer {
 //        streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
         StreamsBuilder builder = new StreamsBuilder();
-        builder.table("input", Materialized.as(new NullStoreSupplier()))
+        builder.stream("input")
+                .groupByKey()
+                .reduce((v1, v2) -> v2, Materialized.as(new NullStoreSupplier()))
                 .toStream()
                 .peek(
                         (k, v) -> System.out.println("Got :" + k + ":" + v)
