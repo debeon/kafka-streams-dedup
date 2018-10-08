@@ -21,7 +21,8 @@ public class Consumer {
 //        streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
         StreamsBuilder builder = new StreamsBuilder();
-        builder.table("input", Materialized.as(new NullStoreSupplier()))
+        builder
+                .table("input", Materialized.as(new NullStoreSupplier()).withLoggingDisabled())
                 .toStream()
                 .peek(
                         (k, v) -> System.out.println("Got :" + k + ":" + v)

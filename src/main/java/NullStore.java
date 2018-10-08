@@ -1,28 +1,31 @@
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.processor.ProcessorContext;
-import org.apache.kafka.streams.processor.StateRestoreCallback;
 import org.apache.kafka.streams.processor.StateStore;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.KeyValueStore;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NullStore implements KeyValueStore<Bytes, byte[]> {
 
+    private static AtomicInteger counter = new AtomicInteger();
+
     @Override
     public void put(Bytes key, byte[] value) {
-
+        System.out.println("put:" + counter.incrementAndGet());
     }
 
     @Override
     public byte[] putIfAbsent(Bytes key, byte[] value) {
+        System.out.println("putisabsent");
         return new byte[0];
     }
 
     @Override
     public void putAll(List<KeyValue<Bytes, byte[]>> entries) {
-
+        System.out.println("putall");
     }
 
     @Override
@@ -38,15 +41,9 @@ public class NullStore implements KeyValueStore<Bytes, byte[]> {
     @Override
     public void init(ProcessorContext context, StateStore root) {
         if (root != null) {
-            context.register(root, false, new StateRestoreCallback() {
-                @Override
-                public void restore(byte[] key, byte[] value) {
-                    if (value == null) {
-                        delete(null);
-                    } else {
-                        put(null, null);
-                    }
-                }
+            context.register(root, false, (key, value) -> {
+                System.out.println("restored:" + counter.incrementAndGet());
+                //do nothing
             });
         }
     }

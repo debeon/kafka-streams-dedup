@@ -21,9 +21,10 @@ public class ConsumerStream {
 //        streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0);
 
         StreamsBuilder builder = new StreamsBuilder();
-        builder.stream("input")
+        builder
+                .stream("input")
                 .groupByKey()
-                .reduce((v1, v2) -> v2, Materialized.as(new NullStoreSupplier()))
+                .reduce((v1, v2) -> v2, Materialized.as(new NullStoreSupplier()).withLoggingDisabled())
                 .toStream()
                 .peek(
                         (k, v) -> System.out.println("Got :" + k + ":" + v)
